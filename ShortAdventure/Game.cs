@@ -10,6 +10,7 @@ namespace ShortAdventure {
             MapSize = new Position(width, height);
             PlayerPos = new Position(1, 1);
             GoalPos = new Position(MapSize.X - 2, MapSize.Y - 2);
+            
             MakeMap();
 
 

@@ -5,24 +5,29 @@ namespace ShortAdventure {
         static void Main(string[] args) {
             Game.Intialize(10, 20);
 
-            Console.WriteLine(Game.PlayerPos.ToString());
-            Start();
+            Console.CursorVisible = false;
 
+            //Start();
+            Automation.RandomPlay();
         }
         public static void Start() {
+            Draw.NextFrame();
             bool isRunning = true;
             while (isRunning) {
-                GetDirectionAndGo();
-                Draw.Start();
+                GetDirectionAndMove();
+                Draw.NextFrame();
                 Console.WriteLine(Position.Parse(Game.PlayerPos.ToString()) + "          ");
-                if (Game.ReachedGoal()) Console.Write("You reached the goal, woohoo");
+                if (Game.ReachedGoal()) {
+                    Console.Write("You reached the goal, woohoo");
+                    isRunning = false;
+                }
                 Console.WriteLine();
 
 
 
             }
         }
-        private static void GetDirectionAndGo() {
+        private static void GetDirectionAndMove() {
             ConsoleKey key = Console.ReadKey(true).Key;
             switch (key) {
                 case ConsoleKey.W or ConsoleKey.UpArrow:
@@ -66,8 +71,8 @@ namespace ShortAdventure {
         }
     }
     public class Draw {
-        static public void Start() {
-            Console.SetCursorPosition(0,0);
+        static public void NextFrame() {
+            Console.SetCursorPosition(0, 0);
             for (int i = 0; i < Game.MapSize.X; i++) {
                 for (int j = 0; j < Game.MapSize.Y; j++) {
                     Console.Write(GetVisualBlock(i, j));

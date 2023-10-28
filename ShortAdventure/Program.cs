@@ -14,7 +14,7 @@ namespace ShortAdventure {
             while (isRunning) {
                 GetDirectionAndGo();
                 Draw.Start();
-                Console.WriteLine(Position.Parse(Game.PlayerPos.ToString()));
+                Console.WriteLine(Position.Parse(Game.PlayerPos.ToString()) + "          ");
                 if (Game.ReachedGoal()) Console.Write("You reached the goal, woohoo");
                 Console.WriteLine();
 
@@ -67,7 +67,7 @@ namespace ShortAdventure {
     }
     public class Draw {
         static public void Start() {
-            Console.Clear();
+            Console.SetCursorPosition(0,0);
             for (int i = 0; i < Game.MapSize.X; i++) {
                 for (int j = 0; j < Game.MapSize.Y; j++) {
                     Console.Write(GetVisualBlock(i, j));

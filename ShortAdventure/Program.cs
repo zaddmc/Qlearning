@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks.Dataflow;
 
 namespace ShortAdventure {
     internal class Program {
@@ -15,7 +16,7 @@ namespace ShortAdventure {
                 GetDirectionAndGo();
                 Draw.Start();
                 Console.WriteLine(Position.Parse(Game.PlayerPos.ToString()));
-                if (Game.ReachedGoal()) Console.Write(" You reached the goal, woohoo");
+                if (Game.ReachedGoal()) Console.Write("You reached the goal, woohoo");
                 Console.WriteLine();
 
 
@@ -33,6 +34,10 @@ namespace ShortAdventure {
                     Movement.Move(Movement.MoveDirection.south); break;
                 case ConsoleKey.A or ConsoleKey.LeftArrow:
                     Movement.Move(Movement.MoveDirection.west); break;
+                case ConsoleKey.Q:
+                    Console.WriteLine("write x and y cordinates to add obstruction: ");
+                    
+                    break;
             }
 
         }

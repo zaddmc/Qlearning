@@ -21,6 +21,8 @@ namespace ShortAdventure {
                     TileType toBeAdded = TileType.empty;
                     if (i == PlayerPos.X && j == PlayerPos.Y) toBeAdded = TileType.player;
                     if (i == GoalPos.X && j == GoalPos.Y) toBeAdded = TileType.goal;
+                    if (i == 0 || i == MapSize.X-1) toBeAdded = TileType.obstruction;
+                    if (j == 0 || j == MapSize.Y-1) toBeAdded = TileType.obstruction;
                     PositionMap.Add(new Position(i, j).ToString(), toBeAdded);
                 }
             }
@@ -41,7 +43,11 @@ namespace ShortAdventure {
             if (PlayerPos.ToString() == GoalPos.ToString()) return true;
             return false;
         }
-
+        public static void AddObstruction(Position pos) {
+            if (pos == null || pos.Equals(PlayerPos ) || pos.Equals(GoalPos)) return;
+            PositionMap.Remove(pos.ToString());
+            PositionMap.Add(pos.ToString(), TileType.obstruction);
+        }
         
     }
     public class Movement {
@@ -123,6 +129,10 @@ namespace ShortAdventure {
             string[] sy = ss[1].Split(":");
 
             return new Position(int.Parse(sx[1]), int.Parse(sy[1]));
+        }
+        public bool Equals(Position other) {
+            if (other == null) return false;
+            if (X ==  other.X && Y == other.Y) return true; return false;
         }
     }
 

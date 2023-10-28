@@ -5,6 +5,7 @@ namespace ShortAdventure {
         static void Main(string[] args) {
             Game.Intialize(10, 20);
 
+                Console.WriteLine(Game.PlayerPos.ToString());
             Start();
 
         }
@@ -20,13 +21,13 @@ namespace ShortAdventure {
         private static void GetDirectionAndGo() {
             ConsoleKey key = Console.ReadKey(true).Key;
             switch (key) {
-                case ConsoleKey.W:
+                case ConsoleKey.W or ConsoleKey.UpArrow:
                     Movement.Move(Movement.MoveDirection.north); break;
-                case ConsoleKey.D:
+                case ConsoleKey.D or ConsoleKey.RightArrow:
                     Movement.Move(Movement.MoveDirection.east); break;
-                case ConsoleKey.S:
+                case ConsoleKey.S or ConsoleKey.DownArrow:
                     Movement.Move(Movement.MoveDirection.south); break;
-                case ConsoleKey.A:
+                case ConsoleKey.A or ConsoleKey.LeftArrow:
                     Movement.Move(Movement.MoveDirection.west); break;
             }
 

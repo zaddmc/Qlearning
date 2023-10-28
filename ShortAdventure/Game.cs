@@ -19,8 +19,8 @@ namespace ShortAdventure {
             for (int i = 0; i < MapSize.X; i++) {
                 for (int j = 0; j < MapSize.Y; j++) {
                     TileType toBeAdded = TileType.empty;
-                    if (i == 0 && j == 0) toBeAdded = TileType.player;
-                    if (i == GoalPos.Y && j == GoalPos.X) toBeAdded = TileType.goal;
+                    if (i == PlayerPos.X && j == PlayerPos.Y) toBeAdded = TileType.player;
+                    if (i == GoalPos.X && j == GoalPos.Y) toBeAdded = TileType.goal;
                     PositionMap.Add(new Position(i, j).ToString(), toBeAdded);
                 }
             }
@@ -33,34 +33,32 @@ namespace ShortAdventure {
     }
     public class Movement {
         public static bool Move(MoveDirection direction) {
+            Position newPos = new(Game.PlayerPos);
+
             switch (direction) {
-                case MoveDirection.north: {
-                        Position newPos = new(Game.PlayerPos.X - 1, Game.PlayerPos.Y);
-                        if (newPos.X < 1 || GetPosTile(newPos) == TileType.obstruction) return false;
-                        Game.MovePlayer(newPos);
-                        return true;
-                    }
-                case MoveDirection.east: {
-                        Position newPos = new(Game.PlayerPos.X, Game.PlayerPos.Y + 1);
-                        if (newPos.Y > Game.MapSize.Y - 2 || GetPosTile(newPos) == TileType.obstruction) return false;
-                        Game.MovePlayer(newPos);
-                        return true;
-                    }
-                case MoveDirection.south: {
-                        Position newPos = new(Game.PlayerPos.X + 1, Game.PlayerPos.Y);
-                        if (newPos.X > Game.MapSize.X - 2 || GetPosTile(newPos) == TileType.obstruction) return false;
-                        Game.MovePlayer(newPos);
-                        return true;
-                    }
-                case MoveDirection.west: {
-                        Position newPos = new(Game.PlayerPos.X, Game.PlayerPos.Y - 1);
-                        if (newPos.Y < 1 || GetPosTile(newPos) == TileType.obstruction) return false;
-                        Game.MovePlayer(newPos);
-                        return true;
-                    }
+                case MoveDirection.north:
+                    newPos.X -= 1;
+                    if (newPos.X < 1) return false;
+                    break;
+                case MoveDirection.east:
+                    newPos.Y += 1;
+                    if (newPos.Y > Game.MapSize.Y - 2) return false;
+                    break;
+                case MoveDirection.south:
+                    newPos.X += 1;
+                    if (newPos.X > Game.MapSize.X - 2) return false;
+                    break;
+                case MoveDirection.west:
+                    newPos.Y -= 1;
+                    if (newPos.Y < 1) return false;
+                    break;
                 default:
                     return false;
             }
+            if (GetPosTile(newPos) == TileType.obstruction) return false;
+            Game.MovePlayer(newPos);
+            return true;
+
         }
         public static TileType GetPosTile(Position pos) {
             return Game.PositionMap[pos.ToString()];
@@ -98,6 +96,10 @@ namespace ShortAdventure {
              */
             X = x;
             Y = y;
+        }
+        public Position(Position position) {
+            X = position.X;
+            Y = position.Y;
         }
         public override string ToString() {
             return string.Format($"x:{X}|y:{Y}");

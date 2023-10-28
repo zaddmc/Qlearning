@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks.Dataflow;
 
 namespace ShortAdventure {
     internal class Program {
@@ -35,11 +34,35 @@ namespace ShortAdventure {
                 case ConsoleKey.A or ConsoleKey.LeftArrow:
                     Movement.Move(Movement.MoveDirection.west); break;
                 case ConsoleKey.Q:
-                    Console.WriteLine("write x and y cordinates to add obstruction: ");
-                    
+                    Game.AddObstruction(GetPositionFromConsole("obstruction"));
                     break;
             }
 
+        }
+        private static Position GetPositionFromConsole(string type) {
+            while (true) {
+
+                Console.WriteLine($"write x and y cordinates to add {type}: ");
+                string consoleOut = Console.ReadLine();
+
+                if (consoleOut == null) {
+                    Console.WriteLine("bad input");
+                    continue;
+                }
+                string[]? ss = null;
+                if (consoleOut.Contains(' ') && consoleOut.Contains(',')) {
+                    consoleOut = consoleOut.Replace(" ", "");
+                    ss = consoleOut.Split(",");
+                }
+                if (consoleOut.Contains(' ')) {
+                    ss = consoleOut.Split(" ");
+                }
+                if (consoleOut.Contains(',')) {
+                    ss = consoleOut.Split(",");
+                }
+                if (ss == null) continue;
+                return new Position(int.Parse(ss[0]), int.Parse(ss[1]));
+            }
         }
     }
     public class Draw {

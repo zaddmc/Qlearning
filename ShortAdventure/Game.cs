@@ -30,6 +30,12 @@ namespace ShortAdventure {
 
         // not ment to be called from this class but from the "Movement" class
         public static void MovePlayer(Position position) { PlayerPos = position; }
+        public static bool ReachedGoal() {
+            if (PlayerPos.ToString() == GoalPos.ToString()) return true;
+            return false;
+        }
+
+        
     }
     public class Movement {
         public static bool Move(MoveDirection direction) {

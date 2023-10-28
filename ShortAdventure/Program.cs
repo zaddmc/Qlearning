@@ -13,9 +13,9 @@ namespace ShortAdventure {
             bool isRunning = true;
             while (isRunning) {
                 GetDirectionAndGo();
-                Console.WriteLine(Game.PlayerPos.ToString());
-
-
+                Console.Write(Game.PlayerPos.ToString());
+                if (Game.ReachedGoal()) Console.Write(" You reached the goal, woohoo");
+                Console.WriteLine();
             }
         }
         private static void GetDirectionAndGo() {

@@ -6,6 +6,7 @@ namespace ShortAdventure {
         public static Position MapSize { get; private set; }
         public static Position PlayerPos { get; private set; }
         public static Position GoalPos { get; private set; }
+        public static int Moves { get; private set; }
         public static void Intialize(int width, int height) {
             MapSize = new Position(width, height);
             PlayerPos = new Position(1, 1);
@@ -38,8 +39,16 @@ namespace ShortAdventure {
             PositionMap.Add(PlayerPos.ToString(), TileType.empty);
             PositionMap.Add(position.ToString(), TileType.player);
 
-            PlayerPos = position; 
+            PlayerPos = position;
+
+            // counting the moves so far
+            Moves++;
         }
+        public static void ResetMoves() {
+            Moves = 0;
+            MovePlayer(new(1, 1));
+        }
+
         public static bool ReachedGoal() {
             if (PlayerPos.ToString() == GoalPos.ToString()) return true;
             return false;

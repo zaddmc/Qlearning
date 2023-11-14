@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace _0hh1 {
     public enum TileState {
@@ -197,8 +198,8 @@ namespace _0hh1 {
         }
         static bool SingleSpaceFiller(TileInfo[] tiles) {
             bool returnState = false;
-            for (int i = 0; i < tiles.Length - 2; i++) {
-                if (tiles[i].TileState == TileState.empty) continue;
+            Parallel.For(0, gridSize - 2, i => {
+                if (tiles[i].TileState == TileState.empty) return;
                 if (tiles[i].TileState == tiles[i + 2].TileState) {
                     // choose next new tilestate
                     TileState newTileState = TileState.yellow;
@@ -209,7 +210,7 @@ namespace _0hh1 {
                         returnState = true;
                     }
                 }
-            }
+            });
             return returnState;
         }
         static bool TwoInSuccesionController() {
@@ -235,9 +236,8 @@ namespace _0hh1 {
         }
         static bool CheckFor2InSuccesion(TileInfo[] tiles) {
             bool returnState = false;
-
-            for (int i = 0; i < tiles.Length - 1; i++) {
-                if (tiles[i].TileState == TileState.empty) continue;
+            Parallel.For(0, gridSize - 1, i => {
+                if (tiles[i].TileState == TileState.empty) return;
                 if (tiles[i].TileState == tiles[i + 1].TileState) {
                     // choose next new tilestate
                     TileState newTileState = TileState.yellow;
@@ -252,7 +252,7 @@ namespace _0hh1 {
                         returnState = true;
                     }
                 }
-            }
+            });
             return returnState;
         }
         static bool IsDone() {

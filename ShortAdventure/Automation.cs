@@ -36,4 +36,25 @@ namespace ShortAdventure {
             }
         }
     }
+
+    public class QLearning {
+        public static Movement.MoveDirection NextStep(float[] input, BotBrain bot) {
+            float[] output = bot.EvaluateStep(input);
+            int maxIndex = 0;
+            float maxValue = output[0];
+            for (int i = 0; i < output.Length; i++) {
+                if (output[i] > maxValue) {
+                    maxIndex = i;
+                    maxValue = output[i];
+                }
+            }
+            if (maxIndex >= 4) throw new ArgumentException("not valid");
+            return (Movement.MoveDirection)maxValue;
+        }
+
+
+
+
+
+    }
 }

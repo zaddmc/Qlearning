@@ -13,19 +13,25 @@ namespace _0hh1 {
             WebDriver webDriver = new ChromeDriver();
 
             webDriver.Navigate().GoToUrl("https://0hh1.com/");
-
             bool isRunning = true;
             while (isRunning) {
                 webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
 
                 Thread.Sleep(1000);
-
+                Console.WriteLine($"[{DateTime.Now}] has begun reading");
                 ReadElements(webDriver);
 
+                DateTime beforeAlgo = DateTime.Now;
+                Console.WriteLine($"[{DateTime.Now}] algoritmim has begun");
                 Algorithim();
+                Console.WriteLine($"[{DateTime.Now}] time diff: {(DateTime.Now - beforeAlgo).Milliseconds} miliseconds, algoritmim has finished");
+
 
                 ClickResult(webDriver);
+
+                isRunning = false;
                 if (false) { // if you want to manually begin it
+                    Console.WriteLine("Press and key other than q to continue");
                     ConsoleKey key = Console.ReadKey().Key;
                     if (key == ConsoleKey.Q) isRunning = false;
                 }
@@ -35,49 +41,30 @@ namespace _0hh1 {
 
             webDriver.Quit();
         }
-        static bool BoolCheck(bool[] bools) {
-            for (int i = 0; i < bools.Length; i++) {
-                if (bools[i]) return true;
-            }
-            return false;
-        }
         static void Algorithim() {
             if (Tiles == null) throw new ArgumentNullException("faggot");
-            bool[] checks = new bool[4];
             bool isRunning = true;
-            int countDown = 8;
             while (isRunning) {
-                checks[0] = TwoInSuccesionController();
-                checks[1] = SingleSpaceController();
-                checks[2] = LineCountController();
-                checks[3] = CompareLinesController();
+                TwoInSuccesionController();
+                SingleSpaceController();
+                LineCountController();
+                CompareLinesController();
 
-                isRunning = BoolCheck(checks);
-                // reset countdown
-                if (isRunning) countDown = 8;
-                // insurance
-                if (!isRunning) {
-                    if (countDown > 0)
-                        isRunning = true;
-                    countDown--;
-                }
+                if (IsDone()) isRunning = false;
             }
         }
         static bool CompareLinesController() {
             bool returnState = false;
-            bool isRunning = true;
 
-            while (isRunning) {
-                bool[] bools = new bool[2];
-                for (int i = 0; i < gridSize - 1; i++) {
-                    for (int j = i + 1; j < gridSize; j++) {
-                        bools[0] = CompareTwoLines(Tiles[i], Tiles[j]);
-                        bools[1] = CompareTwoLines(Oreientationconverter(Tiles, i), Oreientationconverter(Tiles, j));
-                    }
+            bool[] bools = new bool[2];
+            for (int i = 0; i < gridSize - 1; i++) {
+                for (int j = i + 1; j < gridSize; j++) {
+                    bools[0] = CompareTwoLines(Tiles[i], Tiles[j]);
+                    bools[1] = CompareTwoLines(Oreientationconverter(Tiles, i), Oreientationconverter(Tiles, j));
                 }
-                if (bools[0] == true || bools[1] == true) returnState = true;
-                if (bools[0] == false && bools[1] == false) isRunning = false;
             }
+            if (bools[0] == true || bools[1] == true) returnState = true;
+
             return returnState;
         }
         static bool CompareTwoLines(TileInfo[] tiles1, TileInfo[] tiles2) {
@@ -126,16 +113,12 @@ namespace _0hh1 {
         }
         static bool LineCountController() {
             bool returnState = false;
-            bool isRunning = true;
-            while (isRunning) {
-                bool[] bools = new bool[2];
-                for (int i = 0; i < gridSize; i++) {
-                    bools[0] = LineCountFinish(Oreientationconverter(Tiles, i));
-                    bools[1] = LineCountFinish(Tiles[i]);
-                }
-                if (bools[0] == true || bools[1] == true) returnState = true;
-                if (bools[0] == false && bools[1] == false) isRunning = false;
+            bool[] bools = new bool[2];
+            for (int i = 0; i < gridSize; i++) {
+                bools[0] = LineCountFinish(Oreientationconverter(Tiles, i));
+                bools[1] = LineCountFinish(Tiles[i]);
             }
+            if (bools[0] == true || bools[1] == true) returnState = true;
             return returnState;
         }
         static bool LineCountFinish(TileInfo[] tiles) {
@@ -156,16 +139,12 @@ namespace _0hh1 {
         }
         static bool SingleSpaceController() {
             bool returnState = false;
-            bool isRunning = true;
-            while (isRunning) {
-                bool[] bools = new bool[2];
-                for (int i = 0; i < gridSize; i++) {
-                    bools[0] = SingleSpaceFiller(Oreientationconverter(Tiles, i));
-                    bools[1] = SingleSpaceFiller(Tiles[i]);
-                }
-                if (bools[0] == true || bools[1] == true) returnState = true;
-                if (bools[0] == false && bools[1] == false) isRunning = false;
+            bool[] bools = new bool[2];
+            for (int i = 0; i < gridSize; i++) {
+                bools[0] = SingleSpaceFiller(Oreientationconverter(Tiles, i));
+                bools[1] = SingleSpaceFiller(Tiles[i]);
             }
+            if (bools[0] == true || bools[1] == true) returnState = true;
             return returnState;
         }
         static bool SingleSpaceFiller(TileInfo[] tiles) {
@@ -187,16 +166,12 @@ namespace _0hh1 {
         }
         static bool TwoInSuccesionController() {
             bool returnState = false;
-            bool isRunning = true;
-            while (isRunning) {
-                bool[] bools = new bool[2];
-                for (int i = 0; i < gridSize; i++) {
-                    bools[0] = CheckFor2InSuccesion(Oreientationconverter(Tiles, i));
-                    bools[1] = CheckFor2InSuccesion(Tiles[i]);
-                }
-                if (bools[0] == true || bools[1] == true) returnState = true;
-                if (bools[0] == false && bools[1] == false) isRunning = false;
+            bool[] bools = new bool[2];
+            for (int i = 0; i < gridSize; i++) {
+                bools[0] = CheckFor2InSuccesion(Oreientationconverter(Tiles, i));
+                bools[1] = CheckFor2InSuccesion(Tiles[i]);
             }
+            if (bools[0] == true || bools[1] == true) returnState = true;
             return returnState;
         }
         static TileInfo[] Oreientationconverter(TileInfo[][] tiles, int index) {
@@ -219,7 +194,7 @@ namespace _0hh1 {
                         tiles[i - 1].TileState = newTileState;
                         returnState = true;
                     }
-                    if (i != 10 && tiles[i + 2].IsLocked == false && tiles[i + 2].TileState == TileState.empty) {
+                    if (i != gridSize - 2 && tiles[i + 2].IsLocked == false && tiles[i + 2].TileState == TileState.empty) {
                         tiles[i + 2].TileState = newTileState;
                         returnState = true;
                     }
@@ -239,16 +214,20 @@ namespace _0hh1 {
             Tiles = new TileInfo[gridSize][];
             for (int i = 0; i < gridSize; i++) {
                 Tiles[i] = new TileInfo[gridSize];
-                for (int j = 0; j < gridSize; j++) {
+                Parallel.For(0, gridSize, j => {
                     Tiles[i][j] = new(webDriver.FindElement(By.Id($"tile-{i}-{j}")));
-                }
+                });
+                //for (int j = 0; j < gridSize; j++) {
+                //    Tiles[i][j] = new(webDriver.FindElement(By.Id($"tile-{i}-{j}")));
+                //}
             }
         }
         static void ClickResult(WebDriver webDriver) {
+
             for (int i = 0; i < gridSize; i++) {
-                for (int j = 0; j < gridSize; j++) {
+                Parallel.For(0, gridSize, j => {
                     TileInfo theTile = Tiles[i][j];
-                    if (theTile.IsLocked) continue;
+                    if (theTile.IsLocked) return;
                     switch (theTile.TileState) {
                         case TileState.empty:
                             break;
@@ -262,7 +241,25 @@ namespace _0hh1 {
                         default:
                             break;
                     }
-                }
+
+                });
+                //for (int j = 0; j < gridSize; j++) {
+                //    TileInfo theTile = Tiles[i][j];
+                //    if (theTile.IsLocked) continue;
+                //    switch (theTile.TileState) {
+                //        case TileState.empty:
+                //            break;
+                //        case TileState.yellow:
+                //            theTile.WebElement.Click();
+                //            break;
+                //        case TileState.blue:
+                //            theTile.WebElement.Click();
+                //            theTile.WebElement.Click();
+                //            break;
+                //        default:
+                //            break;
+                //    }
+                //}
             }
         }
     }

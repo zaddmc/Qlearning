@@ -5,40 +5,16 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace _0hh1 {
-    public enum TileState {
-        empty,
-        yellow,
-        blue,
-    }
     internal class Program {
         public static int gridSize = 12;
 
         public static TileInfo[][]? Tiles;
-        public static TileInfo[][]? DebugTiles;
-        public static bool debug = false;
         static void Main(string[] args) {
-            if (debug) {
-
-                MakeDebugValues();
-                MakeDebugValuesFinished();
-
-                WriteInConsole(false);
-                Console.WriteLine();
-                Algorithim();
-                Console.WriteLine();
-                WriteInConsole(true);
-                Console.WriteLine();
-            }
-
-            // debug statement
-            if (debug) return;
-
             WebDriver webDriver = new ChromeDriver();
 
             webDriver.Navigate().GoToUrl("https://0hh1.com/");
 
             bool isRunning = true;
-            int gamesPlayed = 0;
             while (isRunning) {
                 webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
 
@@ -48,7 +24,7 @@ namespace _0hh1 {
 
                 Algorithim();
 
-                PrintResult(webDriver);
+                ClickResult(webDriver);
                 if (false) { // if you want to manually begin it
                     ConsoleKey key = Console.ReadKey().Key;
                     if (key == ConsoleKey.Q) isRunning = false;
@@ -72,13 +48,9 @@ namespace _0hh1 {
             int countDown = 8;
             while (isRunning) {
                 checks[0] = TwoInSuccesionController();
-                if (debug) { WriteInConsole(true); Console.WriteLine("twoinsuccsion"); }
                 checks[1] = SingleSpaceController();
-                if (debug) { WriteInConsole(true); Console.WriteLine("twoinsuccsion"); }
                 checks[2] = LineCountController();
-                if (debug) { WriteInConsole(true); Console.WriteLine("twoinsuccsion"); }
                 checks[3] = CompareLinesController();
-                if (debug) { WriteInConsole(true); Console.WriteLine("twoinsuccsion"); }
 
                 isRunning = BoolCheck(checks);
                 // reset countdown
@@ -271,10 +243,8 @@ namespace _0hh1 {
                     Tiles[i][j] = new(webDriver.FindElement(By.Id($"tile-{i}-{j}")));
                 }
             }
-
-
         }
-        static void PrintResult(WebDriver webDriver) {
+        static void ClickResult(WebDriver webDriver) {
             for (int i = 0; i < gridSize; i++) {
                 for (int j = 0; j < gridSize; j++) {
                     TileInfo theTile = Tiles[i][j];
@@ -295,402 +265,11 @@ namespace _0hh1 {
                 }
             }
         }
-        static int ConsoleCallTimes = 0;
-        static void WriteInConsole(bool newLine) {
-            int indent = (gridSize + 2) * ConsoleCallTimes;
-
-            if (Tiles == null) throw new ArgumentNullException("fuck you");
-            if (newLine) ConsoleCallTimes = 0;
-            for (int i = 0; i < gridSize; i++) {
-                if (!newLine) Console.SetCursorPosition(indent, i);
-                for (int j = 0; j < gridSize; j++) {
-                    TileInfo selectedTile = Tiles[i][j];
-                    Console.ForegroundColor = GetTileStateColor(selectedTile);
-                    Console.Write("█");
-                }
-                if (debug) {
-
-                    Console.Write("  ");
-                    for (int j = 0; j < gridSize; j++) {
-                        TileInfo selectedTile = Tiles[i][j];
-                        TileInfo selectedTruth = DebugTiles[i][j];
-
-                        if (selectedTile.TileState == selectedTruth.TileState)
-                            Console.ForegroundColor = GetTileStateColor(selectedTruth);
-                        else if (selectedTile.TileState == TileState.empty) Console.ForegroundColor = GetTileStateColor(selectedTruth);
-                        else if (selectedTile.TileState != selectedTruth.TileState) {
-                            if (selectedTile.TileState == TileState.blue) Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            else if (selectedTile.TileState == TileState.yellow) Console.ForegroundColor = ConsoleColor.DarkRed;
-                            else Console.ForegroundColor = ConsoleColor.DarkGray;
-                        }
-
-
-                        Console.Write("█");
-                    }
-                    Console.WriteLine();
-                }
-            }
-            Console.ForegroundColor = ConsoleColor.Gray;
-            ConsoleCallTimes++;
-        }
-        static ConsoleColor GetTileStateColor(TileInfo tile) {
-            switch (tile.TileState) {
-                case TileState.empty: return ConsoleColor.DarkGray;
-                case TileState.yellow: return ConsoleColor.DarkYellow;
-                case TileState.blue: return ConsoleColor.Blue;
-                default: break;
-            }
-            return ConsoleColor.Gray;
-        }
-        static void MakeDebugValues() {
-            Tiles = new TileInfo[][] {
-            new TileInfo[] { // first layer
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-            },
-            new TileInfo[] { // 2. layer
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-            },
-                        new TileInfo[] { // 3. layer
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-            },
-                                    new TileInfo[] { // 4. layer
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-            },
-new TileInfo[] { // 5. layer
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-            },
-            new TileInfo[] { // 6. layer
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-            },
-                        new TileInfo[] { // 7. layer
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-            },
-                                    new TileInfo[] { // 8. layer
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-            },
-                                                new TileInfo[] { // 9. layer
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-            },
-                                                            new TileInfo[] { // 10. layer
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-            },
-                                                                        new TileInfo[] { // 11. layer
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-            },
-                        new TileInfo[] { // 12. layer
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-                new(true, TileState.yellow),
-                new(false, TileState.empty),
-                new(false, TileState.empty),
-            },
-            };
-
-
-        }
-        static void MakeDebugValuesFinished() {
-            DebugTiles = new TileInfo[][] {
-            new TileInfo[] { // first layer
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-            },
-            new TileInfo[] { // 2. layer
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-            },
-                        new TileInfo[] { // 3. layer
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-            },
-                                    new TileInfo[] { // 4. layer
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-            },
-new TileInfo[] { // 5. layer
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-            },
-            new TileInfo[] { // 6. layer
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-            },
-                        new TileInfo[] { // 7. layer
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-            },
-                                    new TileInfo[] { // 8. layer
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-            },
-                                                new TileInfo[] { // 9. layer
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-            },
-                                                            new TileInfo[] { // 10. layer
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-            },
-                                                                        new TileInfo[] { // 11. layer
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-            },
-                        new TileInfo[] { // 12. layer
-                new(true, TileState.yellow),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-                new(true, TileState.blue),
-                new(true, TileState.yellow),
-            },
-            };
-
-
-        }
-
+    }
+    public enum TileState {
+        empty,
+        yellow,
+        blue,
     }
     public class TileInfo {
         //public Point Point { get; private set; }
@@ -715,10 +294,6 @@ new TileInfo[] { // 5. layer
                     break;
             }
             WebElement = element;
-        }
-        public TileInfo(bool islocked, TileState tileState) {
-            this.TileState = tileState;
-            this.IsLocked = islocked;
         }
     }
 }

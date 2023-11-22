@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ namespace _0hh1 {
         public static TileInfo[][]? Tiles;
         static void Main(string[] args) {
             WebDriver webDriver = new ChromeDriver();
+            bool endless = true;
 
             webDriver.Navigate().GoToUrl("https://0hh1.com/");
             bool isRunning = true;
@@ -29,14 +31,17 @@ namespace _0hh1 {
 
                 ClickResult(webDriver);
 
-                isRunning = false;
-                if (false) { // if you want to manually begin it
+
+                isRunning = endless;
+                if (endless) { // if you want to manually begin it
                     Console.WriteLine("Press and key other than q to continue");
-                    ConsoleKey key = Console.ReadKey().Key;
-                    if (key == ConsoleKey.Q) isRunning = false;
+                    if (Console.KeyAvailable) {
+                        ConsoleKey key = Console.ReadKey(true).Key;
+                        if (key == ConsoleKey.Q) isRunning = false;
+                    }
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(2000);
             }
 
             webDriver.Quit();
@@ -214,53 +219,76 @@ namespace _0hh1 {
             Tiles = new TileInfo[gridSize][];
             for (int i = 0; i < gridSize; i++) {
                 Tiles[i] = new TileInfo[gridSize];
-                Parallel.For(0, gridSize, j => {
-                    Tiles[i][j] = new(webDriver.FindElement(By.Id($"tile-{i}-{j}")));
-                });
-                //for (int j = 0; j < gridSize; j++) {
+                //Parallel.For(0, gridSize, j => {
                 //    Tiles[i][j] = new(webDriver.FindElement(By.Id($"tile-{i}-{j}")));
-                //}
+                //});
+                for (int j = 0; j < gridSize; j++) {
+                    Tiles[i][j] = new(webDriver.FindElement(By.Id($"tile-{i}-{j}")));
+                    if (Tiles[i][j].IsLocked == false)
+                        Tiles[i][j].WebElement.Click();
+                }
             }
         }
         static void ClickResult(WebDriver webDriver) {
-
             for (int i = 0; i < gridSize; i++) {
-                Parallel.For(0, gridSize, j => {
+                for (int j = 0; j < gridSize; j++) {
                     TileInfo theTile = Tiles[i][j];
-                    if (theTile.IsLocked) return;
+                    if (theTile.IsLocked) continue;
                     switch (theTile.TileState) {
                         case TileState.empty:
                             break;
                         case TileState.yellow:
-                            theTile.WebElement.Click();
+                            //theTile.WebElement.Click();
                             break;
                         case TileState.blue:
-                            theTile.WebElement.Click();
+                            //theTile.WebElement.Click();
                             theTile.WebElement.Click();
                             break;
                         default:
                             break;
                     }
-
-                });
-                //for (int j = 0; j < gridSize; j++) {
-                //    TileInfo theTile = Tiles[i][j];
-                //    if (theTile.IsLocked) continue;
-                //    switch (theTile.TileState) {
-                //        case TileState.empty:
-                //            break;
-                //        case TileState.yellow:
-                //            theTile.WebElement.Click();
-                //            break;
-                //        case TileState.blue:
-                //            theTile.WebElement.Click();
-                //            theTile.WebElement.Click();
-                //            break;
-                //        default:
-                //            break;
-                //    }
-                //}
+                }
             }
+        }
+        static void ClickFancyResult(WebDriver webDriver) {
+            List<Fancy> list = new List<Fancy>();
+
+            for (int i = 0; i < gridSize; i++) {
+                for (int j = 0; j < gridSize; j++) {
+                    TileInfo theTile = Tiles[i][j];
+                    if (theTile.IsLocked) continue;
+                    switch (theTile.TileState) {
+                        case TileState.empty:
+                            break;
+                        case TileState.yellow:
+                            list.Add(new(i, j));
+                            break;
+                        case TileState.blue:
+                            list.Add(new(i, j));
+                            list.Add(new(i, j));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            Random random = new Random();
+            while (list.Count > 0) {
+
+                Fancy fancy = list[random.Next(list.Count)];
+                Tiles[fancy.i][fancy.j].WebElement.Click();
+                list.Remove(fancy);
+            }
+
+        }
+    }
+    public struct Fancy {
+        public int i { get; set; }
+        public int j { get; set; }
+
+        public Fancy(int i, int j) {
+            this.i = i;
+            this.j = j;
         }
     }
     public enum TileState {

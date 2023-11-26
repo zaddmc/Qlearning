@@ -2,26 +2,38 @@
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace _0hh1 {
     internal class Program {
         public static int gridSize = 12;
+        public static Point upperLeft = new Point(415, 343); //upper left of the game screen. in the middle
+        public static Point lowerRight = new Point(928, 849);
 
         public static TileInfo[][]? Tiles;
+
+
         static void Main(string[] args) {
+            string filePath = GetFilePath();
+
             WebDriver webDriver = new ChromeDriver();
             bool endless = true;
 
             webDriver.Navigate().GoToUrl("https://0hh1.com/");
+
+            int runs = 0;
             bool isRunning = true;
             while (isRunning) {
                 webDriver.ExecuteScript($"Game.startGame({gridSize},0)");
 
                 Thread.Sleep(1000);
                 Console.WriteLine($"[{DateTime.Now}] has begun reading");
-                ReadElements(webDriver);
+                //ReadElements(webDriver);
+                ReadScreen();
+                string seed = TilesToString();
 
                 DateTime beforeAlgo = DateTime.Now;
                 Console.WriteLine($"[{DateTime.Now}] algoritmim has begun");
@@ -29,11 +41,14 @@ namespace _0hh1 {
                 Console.WriteLine($"[{DateTime.Now}] time diff: {(DateTime.Now - beforeAlgo).Milliseconds} miliseconds, algoritmim has finished");
 
 
-                ClickResult(webDriver);
+                //ClickResult(webDriver);
+                SaveResult(filePath, seed);
 
 
                 isRunning = endless;
                 if (endless) { // if you want to manually begin it
+                    //if (runs == 1000) isRunning = false;
+                    
                     Console.WriteLine("Press and key other than q to continue");
                     if (Console.KeyAvailable) {
                         ConsoleKey key = Console.ReadKey(true).Key;
@@ -41,10 +56,40 @@ namespace _0hh1 {
                     }
                 }
 
-                Thread.Sleep(2000);
+                //Thread.Sleep(2000);
+                runs++;
             }
 
             webDriver.Quit();
+        }
+        static string TilesToString() {
+            string toBeSaved = "";
+            for (int i = 0; i < gridSize; i++) {
+                for (int j = 0; j < gridSize; j++) {
+                    toBeSaved += Tiles[i][j].TileState.ToString() + ",";
+                }
+            }
+            return toBeSaved;
+        }
+        static void SaveResult(string filePath, string seed) {
+            string fileName = "null.csv";
+            StreamWriter sr = new StreamWriter(filePath + fileName, true);
+
+            string result = seed + "," + TilesToString();
+
+            sr.WriteLine(result);
+            sr.Close();
+        }
+        static string GetFilePath() {
+            string exeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string[] strings = exeFilePath.Split("\\");
+
+            string newFilePath = "";
+            for (int i = 0; i < strings.Length - 5; i++) {
+                newFilePath += strings[i] + "\\";
+            }
+            newFilePath += "0hh1Solves\\";
+            return newFilePath;
         }
         static void Algorithim() {
             if (Tiles == null) throw new ArgumentNullException("faggot");
@@ -58,6 +103,37 @@ namespace _0hh1 {
                 if (IsDone()) isRunning = false;
             }
         }
+        static void ReadScreen() {
+            int unitLength = (int)((lowerRight.X - upperLeft.X) / (gridSize - 1)); //unit length is the distance between each box.
+
+            Size size = new(lowerRight.X - upperLeft.X, lowerRight.Y - upperLeft.Y + 1);
+            Bitmap bmp = new Bitmap(size.Width, size.Height);
+            Graphics g = Graphics.FromImage(bmp);
+            g.CopyFromScreen(upperLeft, new(0, 0), size);
+
+            Tiles = new TileInfo[gridSize][];
+            for (int i = 0; i < gridSize; i++) {
+                Tiles[i] = new TileInfo[gridSize];
+                for (int j = 0; j < gridSize; j++) {
+                    Point tempPoint = new Point(upperLeft.X + unitLength * i, upperLeft.Y + unitLength * j);
+                    Color color = bmp.GetPixel(tempPoint.X - upperLeft.X, tempPoint.Y - upperLeft.Y);
+                    if (color.B >= 180) Tiles[i][j] = new(TileState.blue, tempPoint, i, j);
+                    else if (color.G >= 200) Tiles[i][j] = new(TileState.yellow, tempPoint, i, j);
+                    else Tiles[i][j] = new(TileState.empty, tempPoint, i, j);
+                }
+            }
+        }
+        static Point Scalluing(Point point) {
+            float xRes = 1920, yRes = 1080;
+
+            Point newPoint = new Point();
+
+            newPoint.X = (int)((point.X / xRes) * 65535);
+            newPoint.Y = (int)((point.Y / yRes) * 65535);
+
+            return newPoint;
+        }//Converter for simulating input screen size and pixel to use for the mouse ONLY!!!!!
+
         static bool CompareLinesController() {
             bool returnState = false;
 
@@ -297,10 +373,12 @@ namespace _0hh1 {
         blue,
     }
     public class TileInfo {
-        //public Point Point { get; private set; }
+        public Point Point { get; set; }
         public TileState TileState { get; set; }
         public bool IsLocked { get; private set; }
         public IWebElement WebElement { get; private set; }
+        public int X { get; set; }
+        public int Y { get; set; }
         public TileInfo(IWebElement element) {
             switch (element.GetAttribute("class")) {
                 case "tile tile-":
@@ -319,6 +397,13 @@ namespace _0hh1 {
                     break;
             }
             WebElement = element;
+        }
+        public TileInfo(TileState tileState, Point point, int x, int y) {
+            if (tileState != TileState.empty) IsLocked = true;
+            TileState = tileState;
+            Point = point;
+            X = x;
+            Y = y;
         }
     }
 }

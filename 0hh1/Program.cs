@@ -47,7 +47,7 @@ namespace _0hh1 {
 
                 isRunning = endless;
                 if (endless) { // if you want to manually begin it
-                    //if (runs == 1000) isRunning = false;
+                    if (runs == 100) isRunning = false;
                     
                     Console.WriteLine("Press and key other than q to continue");
                     if (Console.KeyAvailable) {
@@ -72,10 +72,10 @@ namespace _0hh1 {
             return toBeSaved;
         }
         static void SaveResult(string filePath, string seed) {
-            string fileName = "null.csv";
+            string fileName = "smalltest.csv";
             StreamWriter sr = new StreamWriter(filePath + fileName, true);
 
-            string result = seed + "," + TilesToString();
+            string result = seed + "|" + TilesToString();
 
             sr.WriteLine(result);
             sr.Close();

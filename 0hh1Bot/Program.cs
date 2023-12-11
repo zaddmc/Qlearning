@@ -10,6 +10,8 @@
             BackPropProgram.Start(args);
             Console.ReadLine();
 
+            return; // the rest is my own shit code and therfore useless
+
             Translator.MakeBot();
 
             bool isrunning = true;

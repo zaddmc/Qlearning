@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 
 namespace _0hh1 {
     internal class Program {
-        public static int gridSize = 12;
-        public static Point upperLeft = new Point(415, 343); //upper left of the game screen. in the middle
-        public static Point lowerRight = new Point(928, 849);
+        public static int gridSize = 4;
+        public static string fileName = "smolData.csv";
+
+        public static Point upperLeft = new Point(341, 451); //upper left of the game screen. in the middle
+        public static Point lowerRight = new Point(955, 1076);
 
         public static TileInfo[][]? Tiles;
 
@@ -47,7 +49,7 @@ namespace _0hh1 {
 
                 isRunning = endless;
                 if (endless) { // if you want to manually begin it
-                    if (runs == 100) isRunning = false;
+                    if (runs == 1000) isRunning = false;
                     
                     Console.WriteLine("Press and key other than q to continue");
                     if (Console.KeyAvailable) {
@@ -72,7 +74,6 @@ namespace _0hh1 {
             return toBeSaved;
         }
         static void SaveResult(string filePath, string seed) {
-            string fileName = "smalltest.csv";
             StreamWriter sr = new StreamWriter(filePath + fileName, true);
 
             string result = seed + "|" + TilesToString();

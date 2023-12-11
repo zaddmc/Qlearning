@@ -2,9 +2,9 @@
 
 class BackPropProgram {
     public static void Start(string[] args) {
-        int numInput = 144; // number features
-        int numHidden = 16; // hidden nodes
-        int numOutput = 144; // number of classes for Y
+        int numInput = 16; // number features
+        int numHidden = 8; // hidden nodes
+        int numOutput = 16; // number of classes for Y
         int numRows = 1000; // aka datasets
         int seed = 1; // gives nice demo | might wanna remove later, it might be problematic that its the same seed for the .random
 

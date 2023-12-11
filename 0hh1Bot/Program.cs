@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace _0hh1Bot {
+﻿namespace _0hh1Bot {
     internal class Program {
         public static Tile[][]? SeedTiles { get; set; }
         public static Tile[][]? TrueTiles { get; set; }
@@ -9,16 +7,39 @@ namespace _0hh1Bot {
         public static int gridSize; // the decompiler sets this value
         static void Main(string[] args) {
 
-                Translator.MakeBot();
+            BackPropProgram.Start(args);
+            Console.ReadLine();
+
+            Translator.MakeBot();
 
             bool isrunning = true;
             while (isrunning) {
                 if (!Nextset()) break; // bit weird, nextset returns a bool for if it was succesful, so if its true nothing matters it can continue, but if false it will break, and that being called from a if statement, which is why its a bit weird
 
-                SeedTiles = Translator.EvaluateStep(SeedTiles);
+                EvaluateStep();
                 Console.WriteLine(lineIndex + Compare().ToString());
             }
 
+        }
+        static float EvaluateStep() {
+            float[] output = Translator.EvaluateStep(SeedTiles);
+
+            //smoothing the output 
+            for (int i = 0; i < output.Length; i++) {
+                switch (output[i]) {
+                    case var _ when output[i] < 0:
+                        output[i] = -1f; break;
+                    case var _ when output[i] > 0:
+                        output[i] = 1f; break;
+                    default:
+                        output[i] = 0f; break;
+                }
+            }
+
+
+
+
+            return 0f;
         }
         static bool Compare() {
 
@@ -29,8 +50,8 @@ namespace _0hh1Bot {
             }
 
             return true;
-        }
-        static string GetFilePath() {
+        } // Compare
+        public static string GetFilePath() {
             string exeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string[] strings = exeFilePath.Split("\\");
 
@@ -100,12 +121,12 @@ namespace _0hh1Bot {
             TileState = tileState;
             if (tileState == TileState.empty) IsLocked = false;
             else IsLocked = true;
-            
+
         }
     }
     public enum TileState {
         empty,
         yellow,
-        blue,
+        blue = -1,
     }
 }

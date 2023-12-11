@@ -24,21 +24,21 @@
             }
 
             // allocates all needed memory space for biases and intializes the value
-            biases = new float[layers.Length][];
-            for (int i = 0; i < layers.Length; i++) {
+            biases = new float[layers.Length - 1][];
+            for (int i = 0; i < biases.Length; i++) {
                 biases[i] = new float[layers[i]];
-                for (int j = 0; j < layers[i]; j++)
-                    biases[i][j] = (rnd.NextSingle() - 0.5f) * 10;
+                for (int j = 0; j < biases[i].Length; j++)
+                    biases[i][j] = (rnd.NextSingle());
             }
 
             // allocates all needed memory space for weights and intializes the value
             weights = new float[layers.Length - 1][][];
             for (int i = 0; i < weights.Length; i++) {
-                weights[i] = new float[layers[i + 1]][];
-                for (int j = 0; j < layers[i + 1]; j++) {
+                weights[i] = new float[layers[i]][];
+                for (int j = 0; j < weights[i].Length; j++) {
                     weights[i][j] = new float[layers[i]];
                     for (int k = 0; k < weights[i][j].Length; k++)
-                        weights[i][j][k] = (rnd.NextSingle() - 0.5f) * 10;
+                        weights[i][j][k] = (rnd.NextSingle());
                 }
             }
         } // constructor with starting values
@@ -95,15 +95,25 @@
             // quickly check if there is any values in the system
             if (neurons == null || biases == null || weights == null) throw new ArgumentNullException("not properly intiated");
 
+            neurons[0] = input;
 
-            for (int i = 1; i < neurons.Length; i++)
-                for (int j = 0; j < neurons[i].Length; j++) {
+            for (int i = 0; i < neurons.Length; i++)
+                for (int j = 0; j < neurons[i].Length - 1; j++) {
                     float value = biases[i][j];
-                    for (int k = 0; k < neurons[i - 1].Length; k++)
-                        value += weights[i - 1][j][k] * neurons[i - 1][k];
+                    for (int k = 0; k < neurons[i + 1].Length; k++) {
+                        value += weights[i][j][k] * neurons[i][j];
+
+                    }
+                    neurons[i][j] = Sigmoid(value);
                 }
 
             return neurons[^1];
+        }
+        private float Sigmoid(float x) {
+            return 1 / (1 + MathF.Pow(MathF.E, -x));
+        }
+        private float SigmoidDerivative(float x) {
+            return Sigmoid(x) * (1 - Sigmoid(x));
         }
         public static void SetFilePath(string filePath) {
             FilePath = filePath;

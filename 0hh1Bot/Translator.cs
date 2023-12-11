@@ -6,8 +6,8 @@
             Bot = new BotBrain(layers);
 
 
-        }
-        public static Tile[][] EvaluateStep(Tile[][] inputTiles) {
+        } // MakeBot
+        public static float[] EvaluateStep(Tile[][] inputTiles) {
 
             float[] inputFloats = new float[Program.gridSize * Program.gridSize];
             for (int i = 0; i < Program.gridSize; i++) {
@@ -16,17 +16,8 @@
                 }
             }
 
-            float[] outputFloats = Bot.EvaluateStep(inputFloats);
-
-            Tile[][] outputTiles = new Tile[Program.gridSize][];
-            for (int i = 0; i < Program.gridSize; i++) {
-                outputTiles[i] = new Tile[Program.gridSize];
-                for (int j = 0; j < Program.gridSize; j++) {
-                    outputTiles[i][j] = new Tile((TileState)outputFloats[Program.gridSize * i + j]);
-                }
-            }
-            return outputTiles;
-        }
+            return Bot.EvaluateStep(inputFloats);
+        } // EvaluateStep
         static float TileToFloat(Tile tile) {
             switch (tile.TileState) {
                 case TileState.empty: return 0f;
@@ -34,6 +25,6 @@
                 case TileState.blue: return -1f;
                 default: return 0f;
             }
-        }
+        } // TileToFloat
     }
 }

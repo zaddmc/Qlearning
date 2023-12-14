@@ -1,4 +1,6 @@
-﻿namespace _0hh1Bot {
+﻿using System.Diagnostics;
+
+namespace _0hh1Bot {
     public class Translator {
         static BotBrain Bot { get; set; }
         static int[] layers = { 144, 8, 8, 144 };
@@ -26,5 +28,32 @@
                 default: return 0f;
             }
         } // TileToFloat
+        static Dictionary<string,int> ValidTables { get; set; }
+        public static int  LookUp(string toCheck) {
+            if (ValidTables == null) MakeLookUpTable();
+
+            return ValidTables[toCheck];
+        }
+        public static int LookUpCount() {
+            if (ValidTables == null) MakeLookUpTable();
+            return ValidTables.Count;
+        }
+        public static void MakeLookUpTable() {
+            string file = Program.GetFilePath().Replace(".csv", "Uniques.csv");
+            StreamReader sr = new StreamReader(file);
+            int i = 0;
+            int fails = 0;
+            ValidTables = new Dictionary<string, int>();
+            while (!sr.EndOfStream) {
+                try {
+                    ValidTables.Add(sr.ReadLine(), i++);
+                }
+                catch (Exception) {
+                    Debug.WriteLine("idk what happend, but lookup table didnt like it");
+                    fails++;
+                }
+            }
+        }
+
     }
 }

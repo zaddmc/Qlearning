@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace _0hh1 {
     internal class Program {
         public static int gridSize = 4;
-        public static string fileName = "smolData.csv";
+        public static string fileName = "smolBigData.csv";
 
         public static Point upperLeft = new Point(341, 451); //upper left of the game screen. in the middle
         public static Point lowerRight = new Point(955, 1076);
@@ -49,7 +49,7 @@ namespace _0hh1 {
 
                 isRunning = endless;
                 if (endless) { // if you want to manually begin it
-                    if (runs == 1000) isRunning = false;
+                    if (runs == 1000000) isRunning = false;
                     
                     Console.WriteLine("Press and key other than q to continue");
                     if (Console.KeyAvailable) {

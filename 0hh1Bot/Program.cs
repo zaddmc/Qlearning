@@ -3,7 +3,7 @@
         public static Tile[][]? SeedTiles { get; set; }
         public static Tile[][]? TrueTiles { get; set; }
 
-        static string file = "smalltest.csv";
+        static string file = "smolData.csv";
         public static int gridSize; // the decompiler sets this value
         static void Main(string[] args) {
 

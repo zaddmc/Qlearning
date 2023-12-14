@@ -3,7 +3,7 @@
 class BackPropProgram {
     public static void Start(string[] args) {
         int numInput = 16; // number features
-        int numHidden = 8; // hidden nodes
+        int numHidden = 32; // hidden nodes
         int numOutput = 16; // number of classes for Y
         int numRows = 1000; // aka datasets
         int seed = 1; // gives nice demo | might wanna remove later, it might be problematic that its the same seed for the .random
@@ -11,6 +11,8 @@ class BackPropProgram {
         //Console.WriteLine("Generating " + numRows + " artificial data items with " + numInput + " features");
         //double[][] allData = MakeAllData(numInput, numHidden, numOutput, numRows, seed); // this will likely be replaced with one reading data instead of generating it
         //Console.WriteLine("Done");
+
+        numOutput = Translator.LookUpCount(); // this will give the corect num output based on facts
 
         Console.WriteLine("Reading Data from " + Program.GetFilePath());
         double[][] allData = ReadAllData(numInput, numOutput, out numRows);
@@ -30,7 +32,7 @@ class BackPropProgram {
         Console.WriteLine("Creating a " + numInput + "-" + numHidden + "-" + numOutput + " neural network");
         NeuralNetwork nn = new NeuralNetwork(numInput, numHidden, numOutput);
 
-        int maxEpochs = 10000;
+        int maxEpochs = 100000;
         double learnRate = 0.05;
         double momentum = 0.01;
         Console.WriteLine("\nSetting maxEpochs = " + maxEpochs);
@@ -121,10 +123,15 @@ class BackPropProgram {
             for (int j = 0; j < inputStr.Length - 1; j++) {
                 result[i][j] = SwitchFor0hh1(inputStr[j]);
             }
-            string[] outputStr = fileArr[1].Split(',');
-            for (int j = 0; j < outputStr.Length - 1; j++) {
-                result[i][j + inputStr.Length - 1] = SwitchFor0hh1(outputStr[j]);
+           
+            string outputStr = fileArr[1];
+            double[] oneOfN = new double[numOutput]; // all 0.0
+            oneOfN[Translator.LookUp(outputStr)] = 1d;
+            for (int j = 0; j < numOutput; j++) {
+                result[i][j] = oneOfN[j];
             }
+
+
         }
 
 
@@ -136,9 +143,9 @@ class BackPropProgram {
     }
     static double SwitchFor0hh1(string input) { // helper for ReadAllData
         switch (input) {
-            case "yellow": return 1d;
-            case "blue": return 0d;
-            case "empty": return -1d;
+            case "yellow": return 5d;
+            case "blue": return -5d;
+            case "empty": return 0d;
             default: throw new Exception("not good, in SwitchFor0hh1");
         }
     }

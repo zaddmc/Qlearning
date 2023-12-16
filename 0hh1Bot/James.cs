@@ -32,7 +32,7 @@ class BackPropProgram {
         Console.WriteLine("Creating a " + numInput + "-" + numHidden + "-" + numOutput + " neural network");
         NeuralNetwork nn = new NeuralNetwork(numInput, numHidden, numOutput);
 
-        int maxEpochs = 100000;
+        int maxEpochs = 10000;
         double learnRate = 0.05;
         double momentum = 0.01;
         Console.WriteLine("\nSetting maxEpochs = " + maxEpochs);

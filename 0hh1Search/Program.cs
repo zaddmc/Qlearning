@@ -4,14 +4,18 @@ internal class Program {
     static string filepath = "C:\\Users\\david\\source\\repos\\zaddmc\\Qlearning\\0hh1Solves\\smolData.csv";
     static void Main(string[] args) {
         Console.WriteLine("Hello, World!");
+
         StreamReader sr = new StreamReader(filepath);
         List<string> items = new List<string>();
+
         while (!sr.EndOfStream) {
             string[] item = sr.ReadLine().Split('|');
             items.Add(item[1]);
         }
+
         //Similarities(items);
         //SaveUniques(items);
+
         var temp = HashTest(items);
         SaveHash(temp);
     }

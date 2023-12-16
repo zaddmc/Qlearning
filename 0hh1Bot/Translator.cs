@@ -49,6 +49,7 @@ namespace _0hh1Bot {
                     ValidTables.Add(sr.ReadLine(), i++);
                 }
                 catch (Exception) {
+                    // only for debugging
                     Debug.WriteLine("idk what happend, but lookup table didnt like it");
                     fails++;
                 }
